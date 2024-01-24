@@ -2,10 +2,7 @@
 """ mongodb """
 
 
-from typing import List, Dict, Union
-
-
-def insert_school(mongo_collection, **kwargs) -> str:
+def insert_school(mongo_collection, **kwargs):
     """ insert a new school """
     query = mongo_collection.insert_one(kwargs)
 
