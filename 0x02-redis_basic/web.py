@@ -3,8 +3,6 @@ import redis
 import requests
 from functools import wraps
 
-from datetime import datetime, timedelta
-
 rds = redis.Redis()
 
 

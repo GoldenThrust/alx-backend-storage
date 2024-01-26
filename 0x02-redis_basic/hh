@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import uuid
 import redis
 from typing import Union, Optional, Callable
@@ -31,7 +30,7 @@ def call_history(f: Callable) -> Callable:
     return wrapper
 
 
-def replay(f: Callable) -> None:
+ef replay(f: Callable) -> None:
     """
     Displays the inputs and outputs of a function stored in Redis.
     """
@@ -92,3 +91,5 @@ class Cache():
         Retrieves an integer from Redis using the provided key.
         """
         return self.get(key, fn=int)
+
+
