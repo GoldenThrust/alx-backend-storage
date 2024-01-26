@@ -12,7 +12,8 @@ class Cache():
 
     def __init__(self):
         """
-        Initializes the Cache class with a Redis instance and flushes the database.
+        Initializes the Cache class with a Redis instance
+        and flushes the database.
         """
         self._redis = redis.Redis()
         self._redis.flushdb()
@@ -51,7 +52,7 @@ class Cache():
 
     @count_calls
     @call_history
-    def store(self, data: Union[int, str, float, bytes]) -> str:
+    def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         Stores data in Redis with a unique key and returns the key.
         """
@@ -59,7 +60,9 @@ class Cache():
         self._redis.set(key, data)
         return key
 
-    def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float]:
+    def get(
+            self, key: str, fn: Optional[Callable] = None
+            ) -> Union[str, bytes, int, float]:
         """
         Retrieves data from Redis using the provided key.
         """

@@ -7,12 +7,15 @@ from datetime import datetime, timedelta
 
 rds = redis.Redis()
 
+
 def cache_url(exp_time):
     """
     Decorator function for caching the result of a URL request in Redis.
     """
     def decorator(f):
+        """ decorator function """
         wraps(f)
+
         def wrapper(url):
             """
             Wrapper function to check and retrieve the result from the
@@ -23,17 +26,16 @@ def cache_url(exp_time):
 
             if result:
                 return result.decode('utf-8')
-            
+
             res = f(url)
 
             rds.setex(key, exp_time, res)
 
             return res
-        
-        return wrapper
-    
-    return decorator
 
+        return wrapper
+
+    return decorator
 
 
 @cache_url(10)
@@ -46,4 +48,5 @@ def get_page(url: str) -> str:
     if resp.status_code == 200:
         return resp.text
     else:
-        return "Unable to access {}. Status code: {}".format(url, resp.status_code)
+        return "Unable to access {}. Status code: {}".format(
+                url, resp.status_code)
