@@ -24,10 +24,11 @@ def cache_url(exp_time: int) -> Callable[[Callable], Callable]:
             count = "count:{}".format(url)
             key = "result:{}".format('url')
 
+            rds.incr(count)
+
             result = rds.get(key)
 
             if result:
-                rds.incr(count)
                 return result.decode('utf-8')
 
             res = method(url)
