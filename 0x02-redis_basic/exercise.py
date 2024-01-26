@@ -5,50 +5,51 @@ from typing import Union, Optional, Callable
 from functools import wraps
 
 
-def count_calls(f: Callable) -> Callable:
+def count_calls(method: Callable) -> Callable:
     """
     A decorator that increments a counter in Redis for each function call.
     """
 
-    @wraps(f)
+    @wraps(method)
     def wrapper(self, *args, **kwargs):
         """ decorators wrapper """
-        self._redis.incr(f.__qualname__)
-        return f(self, *args, **kwargs)
+        self._redis.incr(method.__qualname__)
+        return method(self, *args, **kwargs)
     return wrapper
 
 
-def call_history(f: Callable) -> Callable:
+def call_history(method: Callable) -> Callable:
     """
     A decorator that stores function inputs and outputs in Redis lists.
     """
 
-    @wraps(f)
+    @wraps(method)
     def wrapper(self, *args, **kwargs):
         """ decorators wrapper """
-        in_key = "{}:inputs".format(f.__qualname__)
-        out_key = "{}:outputs".format(f.__qualname__)
+        in_key = "{}:inputs".format(method.__qualname__)
+        out_key = "{}:outputs".format(method.__qualname__)
         self._redis.rpush(in_key, str(args))
-        result = f(self, *args, **kwargs)
+        result = method(self, *args, **kwargs)
         self._redis.rpush(out_key, str(result))
         return result
     return wrapper
 
 
-def replay(f: Callable) -> None:
+def replay(method: Callable) -> None:
     """
     Displays the inputs and outputs of a function stored in Redis.
     """
-    in_key = "{}:inputs".format(f.__qualname__)
-    out_key = "{}:outputs".format(f.__qualname__)
+    in_key = "{}:inputs".format(method.__qualname__)
+    out_key = "{}:outputs".format(method.__qualname__)
     print(in_key, out_key)
-    inputs = f.__self__._redis.lrange(in_key, 0, -1)
-    outputs = f.__self__._redis.lrange(out_key, 0, -1)
-    print("{} was called {} times:".format(f.__qualname__, len(inputs)))
+    inputs = method.__self__._redis.lrange(in_key, 0, -1)
+    outputs = method.__self__._redis.lrange(out_key, 0, -1)
+    print("{} was called {} times:".format(
+        method.__qualname__, len(inputs)))
     for key, value in zip(outputs, inputs):
         value_str = value.decode("utf-8")
         key_str = key.decode("utf-8")
-        print("{}(*{}) -> {}".format(f.__qualname__, value_str, key_str))
+        print("{}(*{}) -> {}".format(method.__qualname__, value_str, key_str))
 
 
 class Cache():
