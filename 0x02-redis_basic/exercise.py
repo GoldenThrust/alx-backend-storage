@@ -9,8 +9,10 @@ def count_calls(f: Callable) -> Callable:
     """
     A decorator that increments a counter in Redis for each function call.
     """
+
     @wraps(f)
     def wrapper(self, *args, **kwargs):
+        """ decorators wrapper """
         self._redis.incr(f.__qualname__)
         return f(self, *args, **kwargs)
     return wrapper
@@ -20,8 +22,10 @@ def call_history(f: Callable) -> Callable:
     """
     A decorator that stores function inputs and outputs in Redis lists.
     """
+
     @wraps(f)
     def wrapper(self, *args, **kwargs):
+        """ decorators wrapper """
         in_key = "{}:inputs".format(f.__qualname__)
         out_key = "{}:outputs".format(f.__qualname__)
         self._redis.rpush(in_key, str(args))
