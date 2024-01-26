@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+""" Redis cache """
+
 import uuid
 import redis
 from typing import Union, Optional, Callable

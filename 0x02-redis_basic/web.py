@@ -1,31 +1,33 @@
 #!/usr/bin/env python3
+""" Site Cache """
 import redis
 import requests
 from functools import wraps
+from typing import Callable
 
 rds = redis.Redis()
 
 
-def cache_url(exp_time):
+def cache_url(exp_time: int) -> Callable[[Callable], Callable]:
     """
     Decorator function for caching the result of a URL request in Redis.
     """
-    def decorator(f):
+    def decorator(method: Callable) -> Callable:
         """ decorator function """
-        wraps(f)
 
-        def wrapper(url):
+        @wraps(method)
+        def wrapper(url: str) -> str:
             """
             Wrapper function to check and retrieve the result from the
             cache or make a new request.
             """
-            key = f"count:{url}"
+            key = "count:{}".format(url)
             result = rds.get(key)
 
             if result:
                 return result.decode('utf-8')
 
-            res = f(url)
+            res = method(url)
 
             rds.setex(key, exp_time, res)
 
