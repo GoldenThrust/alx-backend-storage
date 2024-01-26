@@ -21,14 +21,17 @@ def cache_url(exp_time: int) -> Callable[[Callable], Callable]:
             Wrapper function to check and retrieve the result from the
             cache or make a new request.
             """
-            key = "count:{}".format(url)
+            count = "count:{}".format(url)
+            key = "result:{}".format('url')
+
             result = rds.get(key)
 
             if result:
+                rds.incr(count)
                 return result.decode('utf-8')
 
             res = method(url)
-
+            rds.set(count, 0)
             rds.setex(key, exp_time, res)
 
             return res
